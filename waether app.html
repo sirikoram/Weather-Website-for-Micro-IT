@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Offline Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #6dd5fa, #2980b9);
+      color: white;
+      padding: 40px;
+      margin: 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .left-section {
+      max-width: 400px;
+    }
+
+    .weather-box {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      width: 250px;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin-left: 10px;
+      border: none;
+      background-color: #3498db;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .right-section img {
+      max-width: 500px;
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .right-section img {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Offline Weather App (Static Data)</h1>
+
+  <div class="container">
+    <!-- Left section: Form and Weather Info -->
+    <div class="left-section">
+      <input type="text" id="cityInput" placeholder="Enter city name (e.g., London)" />
+      <button onclick="showWeather()">Get Weather</button>
+
+      <div class="weather-box" id="weatherInfo" style="display: none;">
+        <h2 id="cityName"></h2>
+        <p><strong>Temperature:</strong> <span id="temp"></span> °C</p>
+        <p><strong>Weather:</strong> <span id="weather"></span></p>
+        <p><strong>Humidity:</strong> <span id="humidity"></span>%</p>
+      </div>
+    </div>
+
+    <!-- Right section: Image -->
+    <div class="right-section">
+      <img
+        src="https://images.pexels.com/photos/416920/pexels-photo-416920.jpeg?cs=srgb"
+        alt="Weather Image"
+      />
+    </div>
+  </div>
+
+  <script>
+    const fakeWeatherData = {
+      "hyderabad": { temp: 32, weather: "Clear sky", humidity: 45 },
+      "delhi": { temp: 38, weather: "Sunny", humidity: 30 },
+      "mumbai": { temp: 34, weather: "Humid", humidity: 60 },
+      "chennai": { temp: 35, weather: "Partly cloudy", humidity: 55 },
+      "kolkata": { temp: 33, weather: "Cloudy", humidity: 65 },
+      "bengaluru": { temp: 29, weather: "Thunderstorm", humidity: 70 },
+      "pune": { temp: 30, weather: "Sunny", humidity: 40 },
+      "ahmedabad": { temp: 36, weather: "Sunny", humidity: 20 },
+      "jaipur": { temp: 37, weather: "Hot", humidity: 25 },
+      "lucknow": { temp: 35, weather: "Hazy", humidity: 40 },
+      "kanpur": { temp: 34, weather: "Sunny", humidity: 35 },
+      "nagpur": { temp: 36, weather: "Clear", humidity: 30 },
+      "visakhapatnam": { temp: 31, weather: "Partly cloudy", humidity: 50 },
+      "bhopal": { temp: 33, weather: "Hot", humidity: 45 },
+      "patna": { temp: 34, weather: "Humid", humidity: 55 },
+      "indore": { temp: 32, weather: "Sunny", humidity: 30 },
+      "thiruvananthapuram": { temp: 30, weather: "Rainy", humidity: 75 },
+      "kochi": { temp: 29, weather: "Heavy Rain", humidity: 80 },
+      "coimbatore": { temp: 31, weather: "Mild", humidity: 50 },
+      "madurai": { temp: 33, weather: "Hot", humidity: 45 },
+      "goa": { temp: 30, weather: "Humid", humidity: 70 },
+      "london": { temp: 16, weather: "Cloudy", humidity: 70 },
+      "new york": { temp: 22, weather: "Rainy", humidity: 80 },
+      "paris": { temp: 18, weather: "Partly cloudy", humidity: 65 },
+      "berlin": { temp: 20, weather: "Clear", humidity: 60 },
+      "tokyo": { temp: 25, weather: "Sunny", humidity: 55 },
+      "beijing": { temp: 28, weather: "Hazy", humidity: 50 },
+      "shanghai": { temp: 27, weather: "Overcast", humidity: 65 },
+      "moscow": { temp: 14, weather: "Snow", humidity: 75 },
+      "sydney": { temp: 19, weather: "Clear", humidity: 60 },
+      "melbourne": { temp: 17, weather: "Windy", humidity: 55 },
+      "los angeles": { temp: 24, weather: "Sunny", humidity: 40 },
+      "chicago": { temp: 20, weather: "Stormy", humidity: 70 },
+      "toronto": { temp: 18, weather: "Cloudy", humidity: 65 },
+      "vancouver": { temp: 16, weather: "Rainy", humidity: 75 },
+      "mexico city": { temp: 26, weather: "Sunny", humidity: 50 },
+      "sao paulo": { temp: 27, weather: "Rain showers", humidity: 80 },
+      "cairo": { temp: 35, weather: "Dry", humidity: 20 },
+      "nairobi": { temp: 22, weather: "Sunny", humidity: 60 },
+      "johannesburg": { temp: 20, weather: "Clear", humidity: 50 },
+      "dubai": { temp: 42, weather: "Hot", humidity: 15 },
+      "riyadh": { temp: 40, weather: "Sunny", humidity: 10 },
+      "istanbul": { temp: 23, weather: "Breezy", humidity: 55 },
+      "rome": { temp: 26, weather: "Partly cloudy", humidity: 60 },
+      "madrid": { temp: 28, weather: "Sunny", humidity: 35 },
+      "bangkok": { temp: 33, weather: "Humid", humidity: 75 },
+      "jakarta": { temp: 31, weather: "Cloudy", humidity: 85 },
+      "singapore": { temp: 32, weather: "Rainy", humidity: 90 },
+      "seoul": { temp: 24, weather: "Cloudy", humidity: 60 },
+      "kuala lumpur": { temp: 30, weather: "Stormy", humidity: 80 }
+    };
+
+    function showWeather() {
+      const cityInput = document.getElementById("cityInput").value.trim().toLowerCase();
+      const weather = fakeWeatherData[cityInput];
+
+      if (weather) {
+        document.getElementById("weatherInfo").style.display = "block";
+        document.getElementById("cityName").textContent = cityInput.charAt(0).toUpperCase() + cityInput.slice(1);
+        document.getElementById("temp").textContent = weather.temp;
+        document.getElementById("weather").textContent = weather.weather;
+        document.getElementById("humidity").textContent = weather.humidity;
+      } else {
+        alert("City not found in static weather data.");
+        document.getElementById("weatherInfo").style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
